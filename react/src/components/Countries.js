@@ -6,7 +6,7 @@ const Countries = () => {
   const [data, setData] = useState([]);
   const [rangeValue, setRangeValue] = useState(40);
   const [selectedRadio, setSelectedRadio] = useState("");
-  const radios = ["Africa", "America", "Europe", "Asia", "Europe"];
+  const radios = ["Africa", "America", "Europe", "Asia", "Oceania"];
 
   useEffect(() => {
     axios
@@ -36,7 +36,7 @@ const Countries = () => {
                   type="radio"
                   value={radio}
                   id={radio}
-                  checked={radio == selectedRadio}
+                  checked={radio === selectedRadio}
                   onChange={(e) => setSelectedRadio(e.target.value)}
                 />
                 <label htmlFor={radio}>{radio}</label>
