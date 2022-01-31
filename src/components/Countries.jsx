@@ -1,22 +1,13 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import Card from "./Card";
+import { isEmpty } from "./../components/Utils";
+import { useSelector } from "react-redux";
 
 const Countries = () => {
-  const [data, setData] = useState([]);
+  const countryData = useSelector((state) => state.countryReducer.data);
   const [rangeValue, setRangeValue] = useState(40);
   const [selectedRadio, setSelectedRadio] = useState("");
   const radios = ["Africa", "America", "Europe", "Asia", "Oceania"];
-
-  useEffect(() => {
-    axios
-      .get(
-        "https://restcountries.com/v3.1/all?fields=name,population,region,capital,flag,flags"
-      )
-      .then((resp) => {
-        setData(resp.data);
-      });
-  }, []);
 
   return (
     <div className="countries">
@@ -50,14 +41,14 @@ const Countries = () => {
           <h5 onClick={() => setSelectedRadio("")}>Annuler la recherche</h5>
         )}
       </div>
+
       <ul className="countries-list">
-        {data
-          .filter((country) => country.region.includes(selectedRadio))
-          .sort((a, b) => b.population - a.population)
-          .filter((country, index) => index < rangeValue)
-          .map((country, idx) => (
-            <Card country={country} key={idx} />
-          ))}
+        {!isEmpty(countryData) &&
+          countryData
+            .filter((country) => country.region.includes(selectedRadio))
+            .sort((a, b) => b.population - a.population)
+            .filter((country, index) => index < rangeValue)
+            .map((country, idx) => <Card country={country} key={idx} />)}
       </ul>
     </div>
   );

@@ -1,11 +1,12 @@
-import axios from "axios";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { editNew } from "../actions/news.action";
 import ArticleDelete from "./ArticleDelete";
 
-const Article = (props) => {
-  const { article } = props;
+const Article = ({ article }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
+  const dispatch = useDispatch();
 
   const dateParser = (date) => {
     let newDate = new Date(date).toLocaleDateString("fr-FR", {
@@ -16,17 +17,17 @@ const Article = (props) => {
     return newDate;
   };
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     // Pour une vrai base de données il n'est pas utile de renvoyer chaque data
     const data = {
       author: article.author,
       content: editedContent ? editedContent : article.content,
       date: article.date,
+      id: article.id,
     };
 
-    axios.put("http://localhost:3003/articles/" + article.id, data).then(() => {
-      setIsEditing(false);
-    });
+    await dispatch(editNew(data));
+    setIsEditing(false);
   };
 
   return (

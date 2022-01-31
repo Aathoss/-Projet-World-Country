@@ -1,43 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Navigation from "../components/Navigation";
 import Logo from "../components/Logo";
-import axios from "axios";
 import Article from "../components/Article";
+import { isEmpty } from "./../components/Utils";
+import { getNews, addNew } from "../actions/news.action";
 
 const News = () => {
-  const [newsData, setNewsData] = useState([]);
-  const [author, setAuthor] = useState([]);
-  const [content, setContent] = useState([]);
+  /* const [newsData, setNewsData] = useState([]); */
+  const newsData = useSelector((state) => state.newsReducer);
+  const [author, setAuthor] = useState("");
+  const [content, setContent] = useState("");
   const [error, setError] = useState(false);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const getData = () => {
-    axios
-      .get("http://localhost:3003/articles")
-      .then((resp) => setNewsData(resp.data));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (content.length < 140) {
       setError(true);
     } else {
-      axios
-        .post("http://localhost:3003/articles", {
-          author: author,
-          content: content,
-          date: Date.now(),
-        })
-        .then(() => {
-          setError(false);
-          setAuthor("");
-          setContent("");
-          getData();
-        });
+      const data = {
+        author: author,
+        content: content,
+        date: Date.now(),
+      };
+
+      await dispatch(addNew(data));
+      setError(false);
+      setAuthor("");
+      setContent("");
+      dispatch(getNews());
     }
   };
 
@@ -65,10 +58,9 @@ const News = () => {
       </form>
 
       <ul className="articles-list">
-        {newsData
-          .sort((a, b) => b.date - a.date)
-          .map((article) => (
-            <Article article={article} key={article.id} />
+        {!isEmpty(newsData) &&
+          newsData.map((article, idx) => (
+            <Article article={article} key={idx} />
           ))}
       </ul>
     </div>
